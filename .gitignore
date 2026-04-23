@@ -30,3 +30,7 @@ airquality-backend/src/main/resources/application.yml
 
 # 保留模板文件
 !airquality-backend/src/main/resources/application-example.yml
+
+# 大文件（超过100MB）
+sql/pollutant_data.sql
+sql/airquality_db.sql
