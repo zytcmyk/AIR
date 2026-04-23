@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>污染源数据管理 - 原型</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+      background: #0f1419;
+      min-height: 100vh;
+      color: #e8eaed;
+    }
+
+    .manage-page {
+      min-height: 100vh;
+      padding: 20px;
+      background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 100%);
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .page-title h1 {
+      margin: 0 0 4px 0;
+      font-size: 22px;
+      font-weight: 600;
+      color: #e8eaed;
+    }
+
+    .page-title p {
+      margin: 0;
+      font-size: 13px;
+      color: #6b7485;
+    }
+
+    .page-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .search-input {
+      width: 140px;
+      padding: 8px 12px;
+      background: #1a1f2e;
+      border: 1px solid rgba(124, 140, 159, 0.2);
+      border-radius: 6px;
+      color: #e8eaed;
+      font-size: 13px;
+    }
+
+    .search-input::placeholder {
+      color: #6b7485;
+    }
+
+    .type-select, .date-picker {
+      padding: 8px 12px;
+      background: #1a1f2e;
+      border: 1px solid rgba(124, 140, 159, 0.2);
+      border-radius: 6px;
+      color: #e8eaed;
+      font-size: 13px;
+      min-width: 130px;
+    }
+
+    .date-picker {
+      width: 240px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #7c9cbf, #a8b0bd);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 4px 15px rgba(124, 156, 191, 0.4);
+    }
+
+    .btn-default {
+      background: rgba(124, 140, 159, 0.1);
+      color: #a8b0bd;
+      border: 1px solid rgba(124, 140, 159, 0.2);
+    }
+
+    .btn-default:hover {
+      border-color: rgba(124, 156, 191, 0.4);
+    }
+
+    .btn-danger {
+      background: rgba(184, 122, 122, 0.15);
+      color: #b87a7a;
+      border: 1px solid rgba(184, 122, 122, 0.2);
+    }
+
+    .table-card {
+      background: #1a1f2e;
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid rgba(124, 140, 159, 0.1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid rgba(124, 140, 159, 0.1);
+    }
+
+    th {
+      font-size: 12px;
+      font-weight: 600;
+      color: #6b7485;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      font-size: 13px;
+      color: #e8eaed;
+    }
+
+    tr:hover {
+      background: rgba(124, 156, 191, 0.05);
+    }
+
+    .checkbox {
+      width: 16px;
+      height: 16px;
+      accent-color: #7c9cbf;
+    }
+
+    .source-tag {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    .tag-industrial { background: rgba(126, 184, 162, 0.15); color: #7eb8a2; }
+    .tag-vehicle { background: rgba(124, 156, 191, 0.15); color: #7c9cbf; }
+    .tag-dust { background: rgba(168, 176, 189, 0.15); color: #a8b0bd; }
+    .tag-coal { background: rgba(201, 184, 150, 0.15); color: #c9b896; }
+    .tag-other { background: rgba(184, 160, 201, 0.15); color: #b8a0c9; }
+
+    .contribution-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .contribution-bar {
+      flex: 1;
+      height: 6px;
+      background: rgba(124, 140, 159, 0.1);
+      border-radius: 3px;
+      overflow: hidden;
+      min-width: 80px;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #7c9cbf, #a8b0bd);
+      border-radius: 3px;
+    }
+
+    .contribution-value {
+      font-size: 12px;
+      font-weight: 500;
+      color: #e8eaed;
+      min-width: 45px;
+      text-align: right;
+    }
+
+    .action-btns {
+      display: flex;
+      gap: 6px;
+    }
+
+    .action-btn {
+      padding: 5px 12px;
+      font-size: 12px;
+      color: #a8b0bd;
+      background: rgba(124, 140, 159, 0.08);
+      border: 1px solid rgba(124, 140, 159, 0.15);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .action-btn:hover {
+      color: #7c9cbf;
+      border-color: rgba(124, 156, 191, 0.3);
+    }
+
+    .action-btn.danger {
+      color: #b87a7a;
+    }
+
+    .action-btn.danger:hover {
+      border-color: rgba(184, 122, 122, 0.3);
+    }
+
+    .pagination-wrapper {
+      margin-top: 20px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pagination-info {
+      font-size: 12px;
+      color: #6b7485;
+    }
+
+    .pagination-btns {
+      display: flex;
+      gap: 4px;
+    }
+
+    .page-btn {
+      padding: 6px 12px;
+      background: rgba(124, 140, 159, 0.08);
+      border: 1px solid rgba(124, 140, 159, 0.15);
+      border-radius: 4px;
+      color: #a8b0bd;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .page-btn.active {
+      background: linear-gradient(135deg, #7c9cbf, #a8b0bd);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    /* 弹窗样式 */
+    .dialog-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .dialog {
+      background: #1a1f2e;
+      border-radius: 12px;
+      padding: 24px;
+      width: 480px;
+      border: 1px solid rgba(124, 140, 159, 0.2);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    }
+
+    .dialog-header {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: #e8eaed;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      color: #6b7485;
+      margin-bottom: 6px;
+    }
+
+    .form-input, .form-select {
+      width: 100%;
+      padding: 10px 12px;
+      background: #0f1419;
+      border: 1px solid rgba(124, 140, 159, 0.2);
+      border-radius: 6px;
+      color: #e8eaed;
+      font-size: 13px;
+    }
+
+    .dialog-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .prototype-badge {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #ff6b6b, #feca57);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <div class="prototype-badge">原型预览</div>
+
+  <div class="manage-page">
+    <header class="page-header">
+      <div class="page-title">
+        <h1>污染源数据管理</h1>
+        <p>管理城市污染源贡献率数据</p>
+      </div>
+      <div class="page-actions">
+        <input type="text" class="search-input" placeholder="搜索城市">
+        <select class="type-select">
+          <option value="">污染源类型</option>
+          <option value="工业排放">工业排放</option>
+          <option value="机动车尾气">机动车尾气</option>
+          <option value="扬尘">扬尘</option>
+          <option value="燃煤">燃煤</option>
+          <option value="其他">其他</option>
+        </select>
+        <input type="text" class="date-picker" placeholder="开始日期 — 结束日期">
+        <button class="btn btn-primary">搜索</button>
+        <button class="btn btn-default">重置</button>
+        <button class="btn btn-primary" onclick="showDialog()">+ 新增</button>
+        <button class="btn btn-danger">批量删除</button>
+      </div>
+    </header>
+
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th width="50"><input type="checkbox" class="checkbox"></th>
+            <th width="70">ID</th>
+            <th width="100">城市</th>
+            <th width="120">污染源类型</th>
+            <th width="200">贡献率</th>
+            <th width="110">日期</th>
+            <th width="140">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="checkbox" class="checkbox"></td>
+            <td>1</td>
+            <td>北京</td>
+            <td><span class="source-tag tag-vehicle">机动车尾气</span></td>
+            <td>
+              <div class="contribution-cell">
+                <div class="contribution-bar"><div class="bar-fill" style="width: 42.5%"></div></div>
+                <span class="contribution-value">42.5%</span>
+              </div>
+            </td>
+            <td>2024-06-15</td>
+            <td>
+              <div class="action-btns">
+                <button class="action-btn">编辑</button>
+                <button class="action-btn danger">删除</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" class="checkbox"></td>
+            <td>2</td>
+            <td>北京</td>
+            <td><span class="source-tag tag-industrial">工业排放</span></td>
+            <td>
+              <div class="contribution-cell">
+                <div class="contribution-bar"><div class="bar-fill" style="width: 25.3%"></div></div>
+                <span class="contribution-value">25.3%</span>
+              </div>
+            </td>
+            <td>2024-06-15</td>
+            <td>
+              <div class="action-btns">
+                <button class="action-btn">编辑</button>
+                <button class="action-btn danger">删除</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" class="checkbox"></td>
+            <td>3</td>
+            <td>上海</td>
+            <td><span class="source-tag tag-vehicle">机动车尾气</span></td>
+            <td>
+              <div class="contribution-cell">
+                <div class="contribution-bar"><div class="bar-fill" style="width: 38.2%"></div></div>
+                <span class="contribution-value">38.2%</span>
+              </div>
+            </td>
+            <td>2024-06-15</td>
+            <td>
+              <div class="action-btns">
+                <button class="action-btn">编辑</button>
+                <button class="action-btn danger">删除</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" class="checkbox"></td>
+            <td>4</td>
+            <td>广州</td>
+            <td><span class="source-tag tag-dust">扬尘</span></td>
+            <td>
+              <div class="contribution-cell">
+                <div class="contribution-bar"><div class="bar-fill" style="width: 20.9%"></div></div>
+                <span class="contribution-value">20.9%</span>
+              </div>
+            </td>
+            <td>2024-06-15</td>
+            <td>
+              <div class="action-btns">
+                <button class="action-btn">编辑</button>
+                <button class="action-btn danger">删除</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" class="checkbox"></td>
+            <td>5</td>
+            <td>深圳</td>
+            <td><span class="source-tag tag-coal">燃煤</span></td>
+            <td>
+              <div class="contribution-cell">
+                <div class="contribution-bar"><div class="bar-fill" style="width: 4.2%"></div></div>
+                <span class="contribution-value">4.2%</span>
+              </div>
+            </td>
+            <td>2024-06-15</td>
+            <td>
+              <div class="action-btns">
+                <button class="action-btn">编辑</button>
+                <button class="action-btn danger">删除</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" class="checkbox"></td>
+            <td>6</td>
+            <td>成都</td>
+            <td><span class="source-tag tag-other">其他</span></td>
+            <td>
+              <div class="contribution-cell">
+                <div class="contribution-bar"><div class="bar-fill" style="width: 7.5%"></div></div>
+                <span class="contribution-value">7.5%</span>
+              </div>
+            </td>
+            <td>2024-06-15</td>
+            <td>
+              <div class="action-btns">
+                <button class="action-btn">编辑</button>
+                <button class="action-btn danger">删除</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="pagination-wrapper">
+        <span class="pagination-info">共 156 条</span>
+        <div class="pagination-btns">
+          <button class="page-btn">上一页</button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn">...</button>
+          <button class="page-btn">16</button>
+          <button class="page-btn">下一页</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 新增/编辑弹窗 -->
+  <div class="dialog-overlay" id="dialogOverlay">
+    <div class="dialog">
+      <div class="dialog-header">新增污染源数据</div>
+      <div class="form-group">
+        <label class="form-label">城市</label>
+        <input type="text" class="form-input" placeholder="请输入城市">
+      </div>
+      <div class="form-group">
+        <label class="form-label">污染源类型</label>
+        <select class="form-select">
+          <option value="">请选择</option>
+          <option value="工业排放">工业排放</option>
+          <option value="机动车尾气">机动车尾气</option>
+          <option value="扬尘">扬尘</option>
+          <option value="燃煤">燃煤</option>
+          <option value="其他">其他</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">贡献率(%)</label>
+        <input type="number" class="form-input" placeholder="请输入贡献率" min="0" max="100">
+      </div>
+      <div class="form-group">
+        <label class="form-label">日期</label>
+        <input type="date" class="form-input">
+      </div>
+      <div class="dialog-footer">
+        <button class="btn btn-default" onclick="hideDialog()">取消</button>
+        <button class="btn btn-primary">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showDialog() {
+      document.getElementById('dialogOverlay').style.display = 'flex';
+    }
+    function hideDialog() {
+      document.getElementById('dialogOverlay').style.display = 'none';
+    }
+    document.getElementById('dialogOverlay').addEventListener('click', function(e) {
+      if (e.target === this) hideDialog();
+    });
+  </script>
+</body>
+</html>

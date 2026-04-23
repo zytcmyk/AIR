@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.airquality.mapper.PollutantMapper">
+
+    <!-- 条件查询污染物数据 -->
+    <select id="searchPollutant" resultType="com.airquality.entity.PollutantData">
+        SELECT id, city, pollutant_type AS pollutantType, value AS concentration, unit, date, create_time AS createTime
+        FROM pollutant_data
+        <where>
+            <if test="dto.city != null and dto.city != ''">
+                AND city LIKE CONCAT('%', #{dto.city}, '%')
+            </if>
+            <if test="dto.pollutantType != null and dto.pollutantType != ''">
+                AND pollutant_type = #{dto.pollutantType}
+            </if>
+            <if test="dto.startDate != null and dto.startDate != ''">
+                AND date &gt;= #{dto.startDate}
+            </if>
+            <if test="dto.endDate != null and dto.endDate != ''">
+                AND date &lt;= #{dto.endDate}
+            </if>
+        </where>
+        ORDER BY date DESC, value DESC
+    </select>
+
+    <!-- 获取某城市某污染物近N天趋势 -->
+    <select id="getTrendByCityAndPollutant" resultType="com.airquality.dto.PollutantTrendDTO">
+        SELECT DATE_FORMAT(date, '%Y-%m-%d') AS date, value AS value
+        FROM pollutant_data
+        WHERE city = #{city}
+        AND pollutant_type = #{pollutantType}
+        ORDER BY date DESC
+        LIMIT #{days}
+    </select>
+
+    <!-- 获取某城市各污染物平均浓度占比 -->
+    <select id="getPollutantComposition" resultType="java.util.Map">
+        SELECT pollutant_type AS name, AVG(value) AS value
+        FROM pollutant_data
+        <where>
+            <if test="city != null and city != ''">
+                AND city = #{city}
+            </if>
+            <if test="startDate != null and startDate != ''">
+                AND date &gt;= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND date &lt;= #{endDate}
+            </if>
+        </where>
+        GROUP BY pollutant_type
+        ORDER BY value DESC
+    </select>
+
+    <!-- 获取某城市多个污染物指定日期的浓度对比 -->
+    <select id="getMultiPollutantCompare" resultType="java.util.Map">
+        SELECT pollutant_type AS pollutantType, value AS value, unit
+        FROM pollutant_data
+        WHERE city = #{city}
+        AND date = #{date}
+        AND pollutant_type IN
+        <foreach collection="pollutants" item="pollutant" open="(" separator="," close=")">
+            #{pollutant}
+        </foreach>
+        ORDER BY value DESC
+    </select>
+
+    <!-- 获取最新污染物数据 -->
+    <select id="getLatestPollutant" resultType="com.airquality.entity.PollutantData">
+        SELECT id, city, pollutant_type AS pollutantType, value AS concentration, unit, date, create_time AS createTime
+        FROM pollutant_data
+        WHERE date = (SELECT MAX(date) FROM pollutant_data)
+        <if test="city != null and city != ''">
+            AND city = #{city}
+        </if>
+        ORDER BY value DESC
+    </select>
+
+    <!-- 统计城市数量 -->
+    <select id="countCities" resultType="java.lang.Integer">
+        SELECT COUNT(DISTINCT city) FROM pollutant_data
+    </select>
+
+    <!-- 统计记录数量 -->
+    <select id="countRecords" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM pollutant_data
+    </select>
+
+    <!-- 获取各污染物平均浓度 -->
+    <select id="getAverageConcentrations" resultType="java.util.Map">
+        SELECT
+            AVG(CASE WHEN pollutant_type = 'PM2.5' THEN value END) AS pm25Avg,
+            AVG(CASE WHEN pollutant_type = 'PM10' THEN value END) AS pm10Avg,
+            AVG(CASE WHEN pollutant_type = 'SO2' THEN value END) AS so2Avg,
+            AVG(CASE WHEN pollutant_type = 'NO2' THEN value END) AS no2Avg,
+            AVG(CASE WHEN pollutant_type = 'O3' THEN value END) AS o3Avg
+        FROM pollutant_data
+        <where>
+            <if test="city != null and city != ''">
+                AND city = #{city}
+            </if>
+        </where>
+    </select>
+
+    <!-- 获取达标率 -->
+    <select id="getComplianceRate" resultType="java.lang.Double">
+        SELECT
+            COUNT(CASE WHEN pollutant_type = 'PM2.5' AND value &lt;= 75 THEN 1 END) * 100.0 / COUNT(*)
+        FROM pollutant_data
+        WHERE pollutant_type = 'PM2.5'
+        <if test="city != null and city != ''">
+            AND city = #{city}
+        </if>
+    </select>
+
+    <!-- 统计达标城市数量 -->
+    <select id="countCompliantCities" resultType="java.lang.Integer">
+        SELECT COUNT(DISTINCT city)
+        FROM pollutant_data
+        WHERE pollutant_type = 'PM2.5' AND value &lt;= 75
+    </select>
+
+    <!-- 获取污染物浓度排名 -->
+    <select id="getRanking" resultType="java.util.Map">
+        SELECT city, value AS value, pollutant_type AS pollutantType
+        FROM pollutant_data
+        WHERE pollutant_type = 'PM2.5'
+        ORDER BY value DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 获取最新污染物数据列表 -->
+    <select id="getLatestList" resultType="java.util.Map">
+        SELECT city, pollutant_type AS pollutantType, DATE_FORMAT(date, '%Y-%m-%d') AS date, value AS concentration
+        FROM pollutant_data
+        ORDER BY date DESC, id DESC
+        LIMIT #{limit}
+    </select>
+
+</mapper>

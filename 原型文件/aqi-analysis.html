@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AQI 空气质量分析</title>
+  <!-- ECharts -->
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+  <!-- 中国地图数据 -->
+  <script src="https://cdn.jsdelivr.net/npm/echarts/map/js/china.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+      background: #0B1426;
+      color: #E8EAED;
+      overflow-x: hidden;
+    }
+
+    .aqi-dashboard {
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ========== 顶部导航栏 ========== */
+    .dashboard-header {
+      height: 60px;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(180deg, rgba(13, 26, 45, 0.95) 0%, rgba(11, 20, 38, 0.9) 100%);
+      border-bottom: 1px solid rgba(0, 255, 255, 0.15);
+      position: relative;
+    }
+
+    .dashboard-header::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.5), transparent);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .back-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(0, 255, 255, 0.08);
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      border-radius: 8px;
+      color: #00FFFF;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .back-btn:hover {
+      background: rgba(0, 255, 255, 0.15);
+      border-color: #00FFFF;
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+    }
+
+    .back-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .page-title h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: #E8EAED;
+    }
+
+    .page-title p {
+      margin: 2px 0 0 0;
+      font-size: 11px;
+      color: #6B7485;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .city-select {
+      padding: 8px 12px;
+      background: rgba(0, 255, 255, 0.05);
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      border-radius: 6px;
+      color: #E8EAED;
+      font-size: 13px;
+      cursor: pointer;
+      outline: none;
+      min-width: 120px;
+    }
+
+    .city-select option {
+      background: #0D1A2D;
+      color: #E8EAED;
+    }
+
+    .current-time {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 14px;
+      background: rgba(0, 255, 255, 0.05);
+      border: 1px solid rgba(0, 255, 255, 0.15);
+      border-radius: 16px;
+    }
+
+    .current-time .date {
+      font-size: 12px;
+      color: #A8B0BD;
+    }
+
+    .current-time .time {
+      font-size: 14px;
+      font-weight: 600;
+      color: #00FFFF;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ========== 主体内容 ========== */
+    .dashboard-body {
+      flex: 1;
+      display: flex;
+      padding: 16px;
+      gap: 16px;
+      overflow: hidden;
+    }
+
+    /* ========== 面板通用 ========== */
+    .panel-left, .panel-right {
+      width: 340px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .panel-center {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chart-card {
+      background: linear-gradient(180deg, rgba(13, 26, 45, 0.9) 0%, rgba(11, 20, 38, 0.95) 100%);
+      border: 1px solid rgba(0, 255, 255, 0.15);
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+      background: rgba(0, 255, 255, 0.03);
+    }
+
+    .card-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #E8EAED;
+    }
+
+    .title-icon {
+      width: 18px;
+      height: 18px;
+      color: #00FFFF;
+    }
+
+    .card-badge {
+      font-size: 11px;
+      padding: 3px 10px;
+      background: rgba(0, 255, 255, 0.1);
+      color: #00FFFF;
+      border-radius: 10px;
+    }
+
+    .card-badge.real-time {
+      background: rgba(0, 228, 0, 0.15);
+      color: #00E400;
+    }
+
+    .card-badge.ai-tag {
+      background: rgba(153, 0, 76, 0.15);
+      color: #99004C;
+    }
+
+    .card-badge.hour-display {
+      background: rgba(0, 255, 255, 0.15);
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    .card-body {
+      flex: 1;
+      padding: 12px;
+    }
+
+    .chart-container {
+      width: 100%;
+      height: 100%;
+      min-height: 180px;
+    }
+
+    /* ========== 左侧面板 ========== */
+    .trend-card {
+      flex: 1;
+    }
+
+    .trend-card .chart-container {
+      min-height: 200px;
+    }
+
+    .compare-card {
+      flex: 1.2;
+    }
+
+    .compare-card .chart-container {
+      min-height: 160px;
+    }
+
+    .card-controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* ========== 中间地图 ========== */
+    .map-card {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .map-body {
+      flex: 1;
+      padding: 8px;
+    }
+
+    .map-body .chart-container {
+      min-height: 350px;
+    }
+
+    /* 时间轴播放器 */
+    .timeline-player {
+      padding: 12px 20px 16px;
+      background: rgba(0, 0, 0, 0.2);
+      border-top: 1px solid rgba(0, 255, 255, 0.1);
+    }
+
+    .play-btn {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 255, 255, 0.1);
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      border-radius: 50%;
+      color: #00FFFF;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin: 0 auto 12px;
+    }
+
+    .play-btn:hover {
+      background: rgba(0, 255, 255, 0.2);
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+    }
+
+    .play-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .timeline-slider {
+      position: relative;
+      padding: 0 5px;
+    }
+
+    .timeline-track {
+      height: 4px;
+      background: rgba(0, 255, 255, 0.15);
+      border-radius: 2px;
+      position: relative;
+    }
+
+    .timeline-progress {
+      height: 100%;
+      background: linear-gradient(90deg, #00FFFF, #FFFF00);
+      border-radius: 2px;
+      transition: width 0.1s;
+    }
+
+    .timeline-thumb {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 14px;
+      height: 14px;
+      background: #00FFFF;
+      border: 2px solid #fff;
+      border-radius: 50%;
+      box-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+      transition: left 0.1s;
+    }
+
+    .slider-input {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .timeline-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      font-size: 10px;
+      color: #6B7485;
+    }
+
+    /* ========== 右侧面板 ========== */
+    .rank-card {
+      flex: 1;
+    }
+
+    .rank-card .chart-container {
+      min-height: 260px;
+    }
+
+    .forecast-card {
+      flex: 1;
+    }
+
+    .forecast-card .chart-container {
+      min-height: 180px;
+    }
+
+    /* ========== 响应式 ========== */
+    @media (max-width: 1400px) {
+      .panel-left, .panel-right {
+        width: 300px;
+      }
+    }
+
+    @media (max-width: 1100px) {
+      .dashboard-body {
+        flex-direction: column;
+        overflow-y: auto;
+      }
+
+      .panel-left, .panel-right {
+        width: 100%;
+        flex-direction: row;
+      }
+
+      .chart-card {
+        flex: 1;
+      }
+
+      .map-card {
+        min-height: 450px;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .panel-left, .panel-right {
+        flex-direction: column;
+      }
+
+      .header-left {
+        gap: 12px;
+      }
+
+      .page-title h1 {
+        font-size: 15px;
+      }
+
+      .page-title p {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="aqi-dashboard">
+    <!-- 顶部导航栏 -->
+    <header class="dashboard-header">
+      <div class="header-left">
+        <button class="back-btn" onclick="goHome()">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M9 22V12h6v10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>返回首页</span>
+        </button>
+        <div class="page-title">
+          <h1>AQI 空气质量分析</h1>
+          <p>实时监测 · 趋势分析 · 预测预警</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <select class="city-select" id="citySelect" onchange="handleCityChange()">
+          <option value="北京">北京</option>
+          <option value="上海">上海</option>
+          <option value="广州">广州</option>
+          <option value="深圳">深圳</option>
+          <option value="杭州">杭州</option>
+          <option value="成都">成都</option>
+          <option value="武汉">武汉</option>
+          <option value="西安">西安</option>
+        </select>
+        <div class="current-time">
+          <span class="date" id="currentDate"></span>
+          <span class="time" id="currentTime"></span>
+        </div>
+      </div>
+    </header>
+
+    <!-- 主体内容 -->
+    <main class="dashboard-body">
+      <!-- 左侧面板 -->
+      <aside class="panel-left">
+        <!-- 历史趋势图 -->
+        <div class="chart-card trend-card">
+          <div class="card-header">
+            <span class="card-title">
+              <svg viewBox="0 0 24 24" fill="none" class="title-icon">
+                <path d="M3 3v18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M7 16l4-4 4 4 5-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              近30天 AQI 趋势
+            </span>
+            <span class="card-badge" id="goodDays">达标天数: 0天</span>
+          </div>
+          <div class="card-body">
+            <div id="trendChart" class="chart-container"></div>
+          </div>
+        </div>
+
+        <!-- 多城市对比 -->
+        <div class="chart-card compare-card">
+          <div class="card-header">
+            <span class="card-title">
+              <svg viewBox="0 0 24 24" fill="none" class="title-icon">
+                <path d="M3 3v18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M7 12l4-4 4 4 5-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              多城市 AQI 对比
+            </span>
+          </div>
+          <div class="card-body">
+            <div id="compareChart" class="chart-container"></div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- 中间区域 - 动态演变地图 -->
+      <section class="panel-center">
+        <div class="chart-card map-card">
+          <div class="card-header">
+            <span class="card-title">
+              <svg viewBox="0 0 24 24" fill="none" class="title-icon">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              AQI 24小时动态演变
+            </span>
+            <span class="card-badge hour-display" id="hourDisplay">00:00</span>
+          </div>
+          <div class="card-body map-body">
+            <div id="mapChart" class="chart-container"></div>
+          </div>
+          <!-- 时间轴播放器 -->
+          <div class="timeline-player">
+            <button class="play-btn" id="playBtn" onclick="togglePlay()">
+              <svg id="playIcon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+            </button>
+            <div class="timeline-slider">
+              <div class="timeline-track">
+                <div class="timeline-progress" id="timelineProgress"></div>
+                <div class="timeline-thumb" id="timelineThumb"></div>
+              </div>
+              <input type="range" min="0" max="23" value="0" id="hourSlider" class="slider-input" oninput="updateMapByHour(this.value)">
+            </div>
+            <div class="timeline-labels">
+              <span>00:00</span>
+              <span>06:00</span>
+              <span>12:00</span>
+              <span>18:00</span>
+              <span>23:00</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 右侧面板 -->
+      <aside class="panel-right">
+        <!-- 城市排名 -->
+        <div class="chart-card rank-card">
+          <div class="card-header">
+            <span class="card-title">
+              <svg viewBox="0 0 24 24" fill="none" class="title-icon">
+                <path d="M8 21h8M12 17v4M7 4h10l-1 9H8L7 4z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="12" cy="14" r="2" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              城市 AQI 排名
+            </span>
+            <span class="card-badge real-time">实时</span>
+          </div>
+          <div class="card-body">
+            <div id="rankChart" class="chart-container"></div>
+          </div>
+        </div>
+
+        <!-- 未来7天预测 -->
+        <div class="chart-card forecast-card">
+          <div class="card-header">
+            <span class="card-title">
+              <svg viewBox="0 0 24 24" fill="none" class="title-icon">
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              未来7天 AQI 预测
+            </span>
+            <span class="card-badge ai-tag">AI预测</span>
+          </div>
+          <div class="card-body">
+            <div id="forecastChart" class="chart-container"></div>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+    // ========== 配置 ==========
+    const AQI_COLORS = {
+      level1: '#00E400',
+      level2: '#FFFF00',
+      level3: '#FF7E00',
+      level4: '#FF0000',
+      level5: '#99004C',
+      level6: '#7E0023'
+    };
+
+    const THEME_COLORS = {
+      text: '#E8EAED',
+      textSecondary: '#A8B0BD',
+      textMuted: '#6B7485',
+      neon: '#00FFFF'
+    };
+
+    // ========== 工具函数 ==========
+    function getAqiLevel(value) {
+      if (value <= 50) return { name: '优', color: AQI_COLORS.level1 };
+      if (value <= 100) return { name: '良', color: AQI_COLORS.level2 };
+      if (value <= 150) return { name: '轻度污染', color: AQI_COLORS.level3 };
+      if (value <= 200) return { name: '中度污染', color: AQI_COLORS.level4 };
+      if (value <= 300) return { name: '重度污染', color: AQI_COLORS.level5 };
+      return { name: '严重污染', color: AQI_COLORS.level6 };
+    }
+
+    function getAqiColor(value) {
+      return getAqiLevel(value).color;
+    }
+
+    // ========== 时间更新 ==========
+    function updateTime() {
+      const now = new Date();
+      document.getElementById('currentDate').textContent =
+        `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      document.getElementById('currentTime').textContent =
+        `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+    }
+
+    setInterval(updateTime, 1000);
+    updateTime();
+
+    // ========== 模拟数据 ==========
+    const provinces = [
+      '北京', '天津', '河北', '山西', '内蒙古',
+      '辽宁', '吉林', '黑龙江', '上海', '江苏',
+      '浙江', '安徽', '福建', '江西', '山东',
+      '河南', '湖北', '湖南', '广东', '广西',
+      '海南', '重庆', '四川', '贵州', '云南',
+      '西藏', '陕西', '甘肃', '青海', '宁夏',
+      '新疆'
+    ];
+
+    // 生成模拟趋势数据
+    function generateTrendData() {
+      const data = [];
+      const today = new Date();
+      for (let i = 29; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        data.push({
+          date: `${date.getMonth() + 1}-${date.getDate()}`,
+          value: Math.floor(Math.random() * 100 + 30)
+        });
+      }
+      return data;
+    }
+
+    // 生成模拟排名数据
+    function generateRankingData() {
+      const cities = ['北京', '上海', '广州', '深圳', '杭州', '成都', '武汉', '西安', '南京', '苏州'];
+      return cities.map(city => ({
+        city,
+        value: Math.floor(Math.random() * 100 + 30)
+      })).sort((a, b) => a.value - b.value);
+    }
+
+    // 生成每小时地图数据
+    function generateHourlyData(hour) {
+      const baseValue = 50 + Math.sin(hour / 24 * Math.PI * 2) * 30;
+      return provinces.map(name => {
+        const randomFactor = Math.random() * 40 - 20;
+        const value = Math.max(20, Math.min(200, baseValue + randomFactor));
+        return { name, value: Math.round(value) };
+      });
+    }
+
+    // ========== 图表实例 ==========
+    let trendChart, compareChart, mapChart, rankChart, forecastChart;
+    let currentHour = 0;
+    let isPlaying = false;
+    let playTimer = null;
+
+    // ========== 初始化趋势图 ==========
+    function initTrendChart() {
+      trendChart = echarts.init(document.getElementById('trendChart'));
+      const trendData = generateTrendData();
+      const goodDays = trendData.filter(d => d.value <= 100).length;
+      document.getElementById('goodDays').textContent = `达标天数: ${goodDays}天`;
+
+      trendChart.setOption({
+        backgroundColor: 'transparent',
+        tooltip: {
+          trigger: 'axis',
+          backgroundColor: 'rgba(11, 20, 38, 0.95)',
+          borderColor: 'rgba(0, 255, 255, 0.3)',
+          textStyle: { color: THEME_COLORS.text },
+          formatter: function(params) {
+            const level = getAqiLevel(params[0].value);
+            return `<div style="font-weight:600;margin-bottom:4px;">${params[0].axisValue}</div>
+                    <div>AQI: <span style="color:${level.color};font-weight:600;">${params[0].value}</span> (${level.name})</div>`;
+          }
+        },
+        grid: { left: 45, right: 20, top: 20, bottom: 30 },
+        xAxis: {
+          type: 'category',
+          data: trendData.map(d => d.date),
+          axisLine: { lineStyle: { color: 'rgba(0, 255, 255, 0.2)' } },
+          axisLabel: { color: THEME_COLORS.textMuted, fontSize: 10 },
+          axisTick: { show: false }
+        },
+        yAxis: {
+          type: 'value',
+          max: 200,
+          axisLine: { show: false },
+          axisLabel: { color: THEME_COLORS.textMuted },
+          splitLine: { lineStyle: { color: 'rgba(0, 255, 255, 0.08)' } }
+        },
+        series: [{
+          type: 'line',
+          data: trendData.map(d => d.value),
+          smooth: true,
+          symbol: 'circle',
+          symbolSize: 4,
+          showSymbol: false,
+          lineStyle: {
+            width: 2.5,
+            color: {
+              type: 'linear',
+              x: 0, y: 0, x2: 1, y2: 0,
+              colorStops: [
+                { offset: 0, color: AQI_COLORS.level1 },
+                { offset: 0.5, color: AQI_COLORS.level2 },
+                { offset: 1, color: AQI_COLORS.level3 }
+              ]
+            }
+          },
+          areaStyle: {
+            color: {
+              type: 'linear',
+              x: 0, y: 0, x2: 0, y2: 1,
+              colorStops: [
+                { offset: 0, color: 'rgba(0, 255, 255, 0.2)' },
+                { offset: 1, color: 'rgba(0, 255, 255, 0)' }
+              ]
+            }
+          },
+          markLine: {
+            silent: true,
+            symbol: 'none',
+            lineStyle: { color: AQI_COLORS.level2, type: 'dashed', width: 1.5 },
+            label: { show: true, position: 'end', formatter: '达标线', color: THEME_COLORS.textMuted, fontSize: 10 },
+            data: [{ yAxis: 100 }]
+          }
+        }]
+      });
+    }
+
+    // ========== 初始化对比图 ==========
+    function initCompareChart() {
+      compareChart = echarts.init(document.getElementById('compareChart'));
+      const cities = ['北京', '上海', '广州'];
+      const dates = ['04-10', '04-11', '04-12', '04-13', '04-14', '04-15', '04-16'];
+      const colors = ['#7eb8a2', '#7c9cbf', '#c9b896'];
+
+      const series = cities.map((city, index) => ({
+        name: city,
+        type: 'bar',
+        data: dates.map(() => Math.floor(Math.random() * 80 + 40)),
+        itemStyle: {
+          color: colors[index],
+          borderRadius: [4, 4, 0, 0]
+        },
+        label: {
+          show: true,
+          position: 'top',
+          color: THEME_COLORS.textSecondary,
+          fontSize: 9,
+          formatter: '{c}'
+        }
+      }));
+
+      compareChart.setOption({
+        backgroundColor: 'transparent',
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: { type: 'shadow' },
+          backgroundColor: 'rgba(11, 20, 38, 0.95)',
+          borderColor: 'rgba(0, 255, 255, 0.3)',
+          textStyle: { color: THEME_COLORS.text }
+        },
+        legend: {
+          data: cities,
+          textStyle: { color: THEME_COLORS.textMuted, fontSize: 11 },
+          top: 0
+        },
+        grid: { left: 45, right: 20, top: 35, bottom: 30 },
+        xAxis: {
+          type: 'category',
+          data: dates,
+          axisLine: { lineStyle: { color: 'rgba(0, 255, 255, 0.2)' } },
+          axisLabel: { color: THEME_COLORS.textMuted, fontSize: 10 },
+          axisTick: { show: false }
+        },
+        yAxis: {
+          type: 'value',
+          axisLine: { show: false },
+          axisLabel: { color: THEME_COLORS.textMuted },
+          splitLine: { lineStyle: { color: 'rgba(0, 255, 255, 0.08)' } }
+        },
+        series
+      });
+    }
+
+    // ========== 初始化地图 ==========
+    function initMapChart() {
+      mapChart = echarts.init(document.getElementById('mapChart'));
+      const initialData = generateHourlyData(0);
+
+      mapChart.setOption({
+        backgroundColor: 'transparent',
+        tooltip: {
+          trigger: 'item',
+          backgroundColor: 'rgba(11, 20, 38, 0.95)',
+          borderColor: 'rgba(0, 255, 255, 0.3)',
+          textStyle: { color: THEME_COLORS.text },
+          formatter: function(params) {
+            if (params.data) {
+              const level = getAqiLevel(params.data.value);
+              return `<div style="font-weight:600;margin-bottom:4px;">${params.name}</div>
+                      <div>AQI: <span style="color:${level.color};font-weight:600;">${params.data.value}</span> (${level.name})</div>`;
+            }
+            return params.name;
+          }
+        },
+        visualMap: {
+          show: true,
+          min: 0,
+          max: 200,
+          left: 20,
+          bottom: 20,
+          text: ['高', '低'],
+          textStyle: { color: THEME_COLORS.textMuted, fontSize: 10 },
+          inRange: {
+            color: [AQI_COLORS.level1, AQI_COLORS.level2, AQI_COLORS.level3, AQI_COLORS.level4, AQI_COLORS.level5]
+          },
+          calculable: true,
+          itemWidth: 10,
+          itemHeight: 100
+        },
+        geo: {
+          map: 'china',
+          roam: true,
+          zoom: 1.2,
+          center: [104.5, 36],
+          scaleLimit: { min: 0.8, max: 5 },
+          label: { show: false },
+          emphasis: {
+            label: { show: true, color: THEME_COLORS.text, fontSize: 11 },
+            itemStyle: {
+              areaColor: 'rgba(0, 255, 255, 0.2)',
+              borderColor: THEME_COLORS.neon,
+              borderWidth: 1.5
+            }
+          },
+          itemStyle: {
+            areaColor: 'rgba(13, 26, 45, 0.6)',
+            borderColor: 'rgba(0, 255, 255, 0.25)',
+            borderWidth: 0.8
+          }
+        },
+        series: [{
+          name: 'AQI',
+          type: 'map',
+          map: 'china',
+          geoIndex: 0,
+          data: initialData.map(item => ({
+            name: item.name,
+            value: item.value,
+            itemStyle: {
+              areaColor: getAqiColor(item.value),
+              opacity: 0.75
+            }
+          })),
+          itemStyle: {
+            borderColor: 'rgba(255, 255, 255, 0.15)',
+            borderWidth: 0.5
+          },
+          emphasis: {
+            itemStyle: { opacity: 0.9 }
+          }
+        }]
+      });
+    }
+
+    // ========== 初始化排名图 ==========
+    function initRankChart() {
+      rankChart = echarts.init(document.getElementById('rankChart'));
+      const rankingData = generateRankingData();
+
+      rankChart.setOption({
+        backgroundColor: 'transparent',
+        tooltip: {
+          trigger: 'axis',
+          backgroundColor: 'rgba(11, 20, 38, 0.95)',
+          borderColor: 'rgba(0, 255, 255, 0.3)',
+          textStyle: { color: THEME_COLORS.text },
+          axisPointer: { type: 'shadow' },
+          formatter: function(params) {
+            const level = getAqiLevel(params[0].value);
+            return `<div style="font-weight:600;">${params[0].name}</div>
+                    <div>AQI: <span style="color:${level.color};font-weight:600;">${params[0].value}</span></div>`;
+          }
+        },
+        grid: { left: 60, right: 40, top: 10, bottom: 20 },
+        xAxis: {
+          type: 'value',
+          max: 150,
+          axisLine: { show: false },
+          axisLabel: { color: THEME_COLORS.textMuted },
+          splitLine: { lineStyle: { color: 'rgba(0, 255, 255, 0.08)' } }
+        },
+        yAxis: {
+          type: 'category',
+          data: rankingData.map(d => d.city),
+          axisLine: { lineStyle: { color: 'rgba(0, 255, 255, 0.2)' } },
+          axisLabel: { color: THEME_COLORS.textSecondary, fontSize: 11 },
+          axisTick: { show: false }
+        },
+        series: [{
+          type: 'bar',
+          data: rankingData.map(d => ({
+            value: d.value,
+            itemStyle: {
+              color: getAqiColor(d.value),
+              borderRadius: [0, 4, 4, 0]
+            }
+          })),
+          barWidth: 12,
+          label: {
+            show: true,
+            position: 'right',
+            color: THEME_COLORS.textSecondary,
+            fontSize: 10,
+            formatter: '{c}'
+          }
+        }]
+      });
+    }
+
+    // ========== 初始化预测图 ==========
+    function initForecastChart() {
+      forecastChart = echarts.init(document.getElementById('forecastChart'));
+      const days = ['明天', '后天', '3天后', '4天后', '5天后', '6天后', '7天后'];
+      const values = [85, 92, 78, 105, 118, 95, 72];
+
+      forecastChart.setOption({
+        backgroundColor: 'transparent',
+        tooltip: {
+          trigger: 'axis',
+          backgroundColor: 'rgba(11, 20, 38, 0.95)',
+          borderColor: 'rgba(0, 255, 255, 0.3)',
+          textStyle: { color: THEME_COLORS.text },
+          formatter: function(params) {
+            const level = getAqiLevel(params[0].value);
+            return `<div style="font-weight:600;">${params[0].axisValue}</div>
+                    <div>预测AQI: <span style="color:${level.color};font-weight:600;">${params[0].value}</span></div>`;
+          }
+        },
+        grid: { left: 45, right: 20, top: 20, bottom: 30 },
+        xAxis: {
+          type: 'category',
+          data: days,
+          axisLine: { lineStyle: { color: 'rgba(0, 255, 255, 0.2)' } },
+          axisLabel: { color: THEME_COLORS.textMuted, fontSize: 10 },
+          axisTick: { show: false }
+        },
+        yAxis: {
+          type: 'value',
+          max: 150,
+          axisLine: { show: false },
+          axisLabel: { color: THEME_COLORS.textMuted },
+          splitLine: { lineStyle: { color: 'rgba(0, 255, 255, 0.08)' } }
+        },
+        series: [{
+          type: 'line',
+          data: values,
+          smooth: true,
+          symbol: 'circle',
+          symbolSize: 6,
+          lineStyle: {
+            width: 2.5,
+            color: THEME_COLORS.neon
+          },
+          areaStyle: {
+            color: {
+              type: 'linear',
+              x: 0, y: 0, x2: 0, y2: 1,
+              colorStops: [
+                { offset: 0, color: 'rgba(0, 255, 255, 0.25)' },
+                { offset: 1, color: 'rgba(0, 255, 255, 0)' }
+              ]
+            }
+          },
+          itemStyle: {
+            color: function(params) {
+              return getAqiColor(params.value);
+            }
+          }
+        }]
+      });
+    }
+
+    // ========== 时间轴控制 ==========
+    function updateMapByHour(hour) {
+      currentHour = parseInt(hour);
+      document.getElementById('hourDisplay').textContent =
+        String(currentHour).padStart(2, '0') + ':00';
+      document.getElementById('timelineProgress').style.width = (currentHour / 23 * 100) + '%';
+      document.getElementById('timelineThumb').style.left = (currentHour / 23 * 100) + '%';
+
+      if (mapChart) {
+        const hourData = generateHourlyData(currentHour);
+        mapChart.setOption({
+          series: [{
+            data: hourData.map(item => ({
+              name: item.name,
+              value: item.value,
+              itemStyle: {
+                areaColor: getAqiColor(item.value),
+                opacity: 0.75
+              }
+            }))
+          }]
+        });
+      }
+    }
+
+    function togglePlay() {
+      isPlaying = !isPlaying;
+      const playIcon = document.getElementById('playIcon');
+
+      if (isPlaying) {
+        playIcon.innerHTML = '<path d="M6 4h4v16H6zM14 4h4v16h-4z"/>';
+        playTimer = setInterval(function() {
+          currentHour = (currentHour + 1) % 24;
+          document.getElementById('hourSlider').value = currentHour;
+          updateMapByHour(currentHour);
+        }, 1000);
+      } else {
+        playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+        clearInterval(playTimer);
+      }
+    }
+
+    // ========== 城市切换 ==========
+    function handleCityChange() {
+      // 重新生成趋势数据
+      initTrendChart();
+    }
+
+    // ========== 返回首页 ==========
+    function goHome() {
+      alert('正在返回首页...');
+    }
+
+    // ========== 窗口大小变化 ==========
+    function handleResize() {
+      trendChart && trendChart.resize();
+      compareChart && compareChart.resize();
+      mapChart && mapChart.resize();
+      rankChart && rankChart.resize();
+      forecastChart && forecastChart.resize();
+    }
+
+    window.addEventListener('resize', handleResize);
+
+    // ========== 初始化 ==========
+    document.addEventListener('DOMContentLoaded', function() {
+      initTrendChart();
+      initCompareChart();
+      initMapChart();
+      initRankChart();
+      initForecastChart();
+      updateMapByHour(0);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,264 @@
+/* 全局样式 - 明亮莫兰迪渐变色风格 */
+
+:root {
+  /* 主色调 - 明亮莫兰迪蓝 */
+  --primary: #6BA3BE;
+  --primary-light: #8BBDD4;
+  --primary-dark: #5A93AE;
+
+  /* 功能色 - 明亮莫兰迪系 */
+  --success: #7DBE8C;      /* 明亮莫兰迪绿 */
+  --warning: #E5C07B;      /* 明亮莫兰迪黄 */
+  --danger: #E5A5A5;       /* 明亮莫兰迪粉 */
+  --info: #B08BD4;         /* 明亮莫兰迪紫 */
+
+  /* AQI 等级色 - 明亮莫兰迪渐变 */
+  --level-1: #7DBE8C;      /* 优 - 明亮绿 */
+  --level-2: #6BA3BE;      /* 良 - 明亮蓝 */
+  --level-3: #E5C07B;      /* 轻度 - 明亮黄 */
+  --level-4: #E5A87B;      /* 中度 - 明亮橙 */
+  --level-5: #E5A5A5;      /* 重度 - 明亮粉 */
+  --level-6: #B08BD4;      /* 严重 - 明亮紫 */
+
+  /* 污染物颜色 - 明亮莫兰迪色系 */
+  --pollutant-pm25: #6BA3BE;
+  --pollutant-pm10: #7DBE8C;
+  --pollutant-so2: #E5C07B;
+  --pollutant-no2: #B08BD4;
+  --pollutant-o3: #E5A5A5;
+  --pollutant-co: #9AB5C5;
+
+  /* 污染源颜色 - 明亮莫兰迪色系 */
+  --source-industry: #6BA3BE;
+  --source-vehicle: #8BBDD4;
+  --source-dust: #A5B5C5;
+  --source-coal: #E5C07B;
+  --source-other: #C5A5D4;
+
+  /* 背景色 - 明亮暖调 */
+  --bg-base: #FAFAF8;
+  --bg-elevated: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-hover: #F5F5F0;
+
+  /* 文字色 */
+  --text-primary: #2D2D2D;
+  --text-secondary: #5A5A5A;
+  --text-muted: #8A8A8A;
+
+  /* 边框 */
+  --border: rgba(0, 0, 0, 0.06);
+  --border-light: rgba(0, 0, 0, 0.04);
+
+  /* 渐变色 - 明亮莫兰迪渐变 */
+  --gradient-primary: linear-gradient(135deg, #6BA3BE 0%, #8BBDD4 100%);
+  --gradient-success: linear-gradient(135deg, #7DBE8C 0%, #9DD4A5 100%);
+  --gradient-warning: linear-gradient(135deg, #E5C07B 0%, #F0D4A5 100%);
+  --gradient-danger: linear-gradient(135deg, #E5A5A5 0%, #F0C5C5 100%);
+  --gradient-info: linear-gradient(135deg, #B08BD4 0%, #C5A5E5 100%);
+
+  /* Element Plus 覆盖 - 明亮莫兰迪风格 */
+  --el-color-primary: #6BA3BE;
+  --el-color-primary-light-3: #8BBDD4;
+  --el-color-primary-light-5: #A5D4E5;
+  --el-color-primary-dark-2: #5A93AE;
+
+  --el-color-success: #7DBE8C;
+  --el-color-warning: #E5C07B;
+  --el-color-danger: #E5A5A5;
+  --el-color-info: #B08BD4;
+
+  --el-bg-color: #FFFFFF;
+  --el-bg-color-page: #FAFAF8;
+  --el-bg-color-overlay: #FFFFFF;
+
+  --el-text-color-primary: #2D2D2D;
+  --el-text-color-regular: #4A4A4A;
+  --el-text-color-secondary: #5A5A5A;
+  --el-text-color-placeholder: #8A8A8A;
+
+  --el-border-color: rgba(0, 0, 0, 0.08);
+  --el-border-color-light: rgba(0, 0, 0, 0.05);
+  --el-border-color-lighter: rgba(0, 0, 0, 0.03);
+
+  --el-fill-color: #F5F5F0;
+  --el-fill-color-light: #FAFAF8;
+  --el-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body, #app {
+  height: 100%;
+  font-family: var(--el-font-family);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { text-decoration: none; color: inherit; }
+
+/* 滚动条 */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #D5D5D5; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #C5C5C5; }
+
+/* Element Plus 组件覆盖 - 明亮莫兰迪风格 */
+
+.el-input__wrapper {
+  background: #FFFFFF !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+  transition: all 0.3s ease !important;
+}
+
+.el-input__wrapper:hover { border-color: rgba(107, 163, 190, 0.5) !important; }
+.el-input__wrapper.is-focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(107, 163, 190, 0.15) !important;
+}
+.el-input__inner { color: var(--text-primary) !important; }
+.el-input__inner::placeholder { color: var(--text-muted) !important; }
+
+.el-date-editor { --el-input-bg-color: #FFFFFF; }
+.el-picker-panel {
+  background: #FFFFFF !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1) !important;
+}
+
+.el-select-dropdown {
+  background: #FFFFFF !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1) !important;
+}
+.el-select-dropdown__item { color: var(--text-secondary) !important; border-radius: 6px !important; margin: 2px 8px !important; }
+.el-select-dropdown__item:hover { background: var(--bg-hover) !important; }
+.el-select-dropdown__item.selected { color: var(--primary) !important; background: rgba(107, 163, 190, 0.1) !important; }
+
+.el-button { border-radius: 10px !important; font-weight: 500 !important; transition: all 0.3s ease !important; }
+.el-button--primary {
+  background: var(--gradient-primary) !important;
+  border: none !important;
+  color: #fff !important;
+}
+.el-button--primary:hover {
+  opacity: 0.92 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(107, 163, 190, 0.35) !important;
+}
+.el-button--default {
+  background: #FFFFFF !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text-secondary) !important;
+}
+.el-button--default:hover {
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+  background: rgba(107, 163, 190, 0.05) !important;
+}
+
+.el-radio-button__inner {
+  background: transparent !important;
+  border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+}
+.el-radio-button__original-radio:checked + .el-radio-button__inner {
+  background: var(--gradient-primary) !important;
+  border-color: var(--primary) !important;
+  color: #fff !important;
+}
+
+.el-table {
+  background: transparent !important;
+  --el-table-bg-color: transparent;
+  --el-table-tr-bg-color: transparent;
+  --el-table-header-bg-color: #FAFAF8;
+  --el-table-row-hover-bg-color: var(--bg-hover);
+  --el-table-border-color: var(--border-light);
+}
+.el-table th.el-table__cell { background: #FAFAF8 !important; color: var(--text-muted) !important; font-weight: 500 !important; }
+.el-table td.el-table__cell { color: var(--text-secondary) !important; }
+
+.el-dropdown-menu {
+  background: #FFFFFF !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1) !important;
+}
+.el-dropdown-menu__item { color: var(--text-secondary) !important; border-radius: 6px !important; margin: 2px 8px !important; }
+.el-dropdown-menu__item:hover { background: var(--bg-hover) !important; color: var(--text-primary) !important; }
+
+.el-message {
+  background: #FFFFFF !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1) !important;
+}
+
+.el-dialog {
+  background: #FFFFFF !important;
+  border: none !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 48px rgba(0, 0, 0, 0.15) !important;
+}
+.el-dialog__title { color: var(--text-primary) !important; font-weight: 600 !important; }
+
+.el-avatar { background: var(--gradient-primary) !important; font-weight: 500 !important; }
+
+.el-loading-mask { background: rgba(250, 250, 248, 0.92) !important; }
+.el-loading-spinner .path { stroke: var(--primary); }
+
+.el-empty__description { color: var(--text-muted) !important; }
+
+.el-tag { border-radius: 6px !important; border: none !important; font-weight: 500 !important; }
+.el-tag--success { background: rgba(125, 190, 140, 0.15) !important; color: var(--success) !important; }
+.el-tag--warning { background: rgba(229, 192, 123, 0.15) !important; color: var(--warning) !important; }
+.el-tag--danger { background: rgba(229, 165, 165, 0.15) !important; color: var(--danger) !important; }
+.el-tag--info { background: rgba(176, 139, 212, 0.15) !important; color: var(--info) !important; }
+
+/* 分页器 */
+.el-pagination .el-pager li {
+  background: transparent !important;
+  color: var(--text-secondary) !important;
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+}
+.el-pagination .el-pager li:hover { color: var(--primary) !important; }
+.el-pagination .el-pager li.is-active {
+  background: var(--gradient-primary) !important;
+  color: #fff !important;
+}
+
+/* 开关 */
+.el-switch.is-checked .el-switch__core {
+  background: var(--gradient-success) !important;
+  border-color: var(--success) !important;
+}
+
+/* 复选框 */
+.el-checkbox__input.is-checked .el-checkbox__inner {
+  background: var(--gradient-primary) !important;
+  border-color: var(--primary) !important;
+}
+
+/* 单选框 */
+.el-radio__input.is-checked .el-radio__inner {
+  background: var(--gradient-primary) !important;
+  border-color: var(--primary) !important;
+}
+
+/* 卡片 */
+.el-card {
+  border: none !important;
+  border-radius: 16px !important;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06) !important;
+  transition: all 0.3s ease !important;
+}
+.el-card:hover {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1) !important;
+}

@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.airquality.mapper.PollutionSourceMapper">
+
+    <!-- 条件查询污染源数据 -->
+    <select id="searchSource" resultType="com.airquality.entity.PollutionSource">
+        SELECT id, city, source_type AS sourceType, contribution_rate AS contributionRate, date, create_time AS createTime
+        FROM pollution_source
+        <where>
+            <if test="dto.city != null and dto.city != ''">
+                AND city LIKE CONCAT('%', #{dto.city}, '%')
+            </if>
+            <if test="dto.sourceType != null and dto.sourceType != ''">
+                AND source_type = #{dto.sourceType}
+            </if>
+            <if test="dto.startDate != null and dto.startDate != ''">
+                AND date &gt;= #{dto.startDate}
+            </if>
+            <if test="dto.endDate != null and dto.endDate != ''">
+                AND date &lt;= #{dto.endDate}
+            </if>
+        </where>
+        ORDER BY date DESC, contribution_rate DESC
+    </select>
+
+    <!-- 获取某城市各污染源平均贡献率 -->
+    <select id="getSourceDistributionByCity" resultType="com.airquality.dto.SourceDistributionDTO">
+        SELECT source_type AS name, AVG(contribution_rate) AS value
+        FROM pollution_source
+        <where>
+            <if test="city != null and city != ''">
+                AND city = #{city}
+            </if>
+            <if test="startDate != null and startDate != ''">
+                AND date &gt;= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND date &lt;= #{endDate}
+            </if>
+        </where>
+        GROUP BY source_type
+        ORDER BY value DESC
+    </select>
+
+    <!-- 获取整体污染源类型分布（所有城市汇总） -->
+    <select id="getOverallSourceDistribution" resultType="com.airquality.dto.SourceDistributionDTO">
+        SELECT source_type AS name, AVG(contribution_rate) AS value
+        FROM pollution_source
+        <where>
+            <if test="startDate != null and startDate != ''">
+                AND date &gt;= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND date &lt;= #{endDate}
+            </if>
+        </where>
+        GROUP BY source_type
+        ORDER BY value DESC
+    </select>
+
+    <!-- 获取某城市某污染源近N天贡献率趋势 -->
+    <select id="getSourceTrendByCityAndType" resultType="com.airquality.dto.SourceTrendDTO">
+        SELECT DATE_FORMAT(date, '%Y-%m-%d') AS date, contribution_rate AS contributionRate
+        FROM pollution_source
+        WHERE city = #{city}
+        AND source_type = #{sourceType}
+        ORDER BY date DESC
+        LIMIT #{days}
+    </select>
+
+    <!-- 获取多城市某污染源贡献率对比 -->
+    <select id="getMultiCitySourceCompare" resultType="java.util.Map">
+        SELECT city, contribution_rate AS contributionRate
+        FROM pollution_source
+        WHERE source_type = #{sourceType}
+        AND date = #{date}
+        AND city IN
+        <foreach collection="cities" item="city" open="(" separator="," close=")">
+            #{city}
+        </foreach>
+        ORDER BY contribution_rate DESC
+    </select>
+
+    <!-- 获取污染源排名 -->
+    <select id="getSourceRanking" resultType="com.airquality.entity.PollutionSource">
+        SELECT id, city, source_type AS sourceType, contribution_rate AS contributionRate, date, create_time AS createTime
+        FROM pollution_source
+        WHERE date = (SELECT MAX(date) FROM pollution_source)
+        <if test="city != null and city != ''">
+            AND city = #{city}
+        </if>
+        ORDER BY contribution_rate DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 获取按周期聚合的趋势数据 -->
+    <select id="getTrendByPeriod" resultType="java.util.Map">
+        SELECT
+            period_value AS period,
+            source_type AS sourceType,
+            avg_contribution_rate AS avgContributionRate
+        FROM source_trend_data
+        WHERE city = #{city}
+        AND period_type = #{period}
+        <if test="startDate != null and startDate != ''">
+            AND period_value &gt;= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND period_value &lt;= #{endDate}
+        </if>
+        ORDER BY period_value ASC, source_type ASC
+    </select>
+
+    <!-- 获取城市污染贡献排名 -->
+    <select id="getCityRankingBySource" resultType="com.airquality.dto.CityRankingDTO">
+        SELECT
+            city,
+            ROUND(AVG(contribution_rate), 2) AS contributionRate,
+            source_type AS sourceType
+        FROM pollution_source
+        <where>
+            <if test="sourceType != null and sourceType != ''">
+                AND source_type = #{sourceType}
+            </if>
+            <if test="startDate != null and startDate != ''">
+                AND date &gt;= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND date &lt;= #{endDate}
+            </if>
+        </where>
+        GROUP BY city, source_type
+        ORDER BY contributionRate DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 获取多城市污染源结构对比数据 -->
+    <select id="getCitySourceStructureCompare" resultType="java.util.Map">
+        SELECT
+            city,
+            source_type AS sourceType,
+            ROUND(AVG(contribution_rate), 2) AS contributionRate
+        FROM pollution_source
+        WHERE city IN
+        <foreach collection="cities" item="city" open="(" separator="," close=")">
+            #{city}
+        </foreach>
+        <if test="startDate != null and startDate != ''">
+            AND date &gt;= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND date &lt;= #{endDate}
+        </if>
+        GROUP BY city, source_type
+        ORDER BY city, source_type
+    </select>
+
+</mapper>

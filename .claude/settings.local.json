@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls \"D:/实训项目/鍩庡競_20250101-20251213\"/*.csv)",
+      "Bash(pip show:*)",
+      "Bash(rm -f \"D:/实训项目/AIRCODE/airquality-backend/src/main/java/com/airquality/service/DataImportService.java\")",
+      "Bash(rm -f \"D:/实训项目/AIRCODE/airquality-backend/src/main/java/com/airquality/service/impl/DataImportServiceImpl.java\")",
+      "Bash(rm -f \"D:/实训项目/AIRCODE/airquality-backend/src/main/java/com/airquality/dto/DataImportResult.java\")",
+      "Bash(rm -f \"D:/实训项目/AIRCODE/airquality-backend/src/main/java/com/airquality/dto/DataImportRequest.java\")",
+      "Bash(rm -f \"D:/实训项目/AIRCODE/airquality-backend/src/main/java/com/airquality/controller/DataImportController.java\")"
+    ]
+  }
+}
