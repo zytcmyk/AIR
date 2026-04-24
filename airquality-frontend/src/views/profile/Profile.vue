@@ -470,14 +470,14 @@ const handleFileChange = async (event) => {
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
-  border: 3px solid #007AFF;
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.25);
+  border: 3px solid #6BA3BE;
+  box-shadow: 0 4px 12px rgba(107, 163, 190, 0.25);
 }
 
 .avatar {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #007AFF, #5AC8FA);
+  background: linear-gradient(135deg, #6BA3BE, #8BBDD4);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -485,8 +485,8 @@ const handleFileChange = async (event) => {
   font-size: 36px;
   font-weight: 600;
   color: #fff;
-  border: 3px solid #007AFF;
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.25);
+  border: 3px solid #6BA3BE;
+  box-shadow: 0 4px 12px rgba(107, 163, 190, 0.25);
 }
 
 .avatar-overlay {
@@ -552,13 +552,13 @@ const handleFileChange = async (event) => {
 }
 
 .tag-admin {
-  background: rgba(255, 149, 0, 0.12);
-  color: #FF9500;
+  background: rgba(229, 168, 123, 0.12);
+  color: #D4A76A;
 }
 
 .tag-user {
-  background: rgba(0, 122, 255, 0.12);
-  color: #007AFF;
+  background: rgba(107, 163, 190, 0.12);
+  color: #6BA3BE;
 }
 
 /* 统计 */
@@ -581,7 +581,7 @@ const handleFileChange = async (event) => {
   display: block;
   font-size: 24px;
   font-weight: 700;
-  color: #007AFF;
+  color: #6BA3BE;
 }
 
 .stat-label {
@@ -608,7 +608,7 @@ const handleFileChange = async (event) => {
   padding: 14px 20px;
   font-size: 14px;
   font-weight: 500;
-  color: #007AFF;
+  color: #6BA3BE;
   background: #F9F9FB;
   border: none;
   border-radius: 12px;
@@ -630,11 +630,11 @@ const handleFileChange = async (event) => {
 }
 
 .action-btn.warning {
-  color: #FF3B30;
+  color: #D48B8B;
 }
 
 .action-btn.warning:hover {
-  background: rgba(255, 59, 48, 0.1);
+  background: rgba(212, 139, 139, 0.1);
 }
 
 /* 设置面板 */
@@ -671,7 +671,7 @@ const handleFileChange = async (event) => {
 }
 
 .tab-btn.active {
-  background: #007AFF;
+  background: #6BA3BE;
   color: #ffffff;
 }
 
@@ -709,9 +709,9 @@ const handleFileChange = async (event) => {
 }
 
 .settings-form :deep(.el-input__wrapper.is-focus) {
-  border-color: #007AFF;
+  border-color: #6BA3BE;
   background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+  box-shadow: 0 0 0 3px rgba(107, 163, 190, 0.1);
 }
 
 .settings-form :deep(.el-input__inner) {
@@ -735,19 +735,19 @@ const handleFileChange = async (event) => {
 
 /* Apple风格按钮 */
 .settings-form :deep(.el-button--primary) {
-  background: #007AFF;
+  background: #6BA3BE;
   border: none;
   border-radius: 10px;
   padding: 12px 28px;
   font-size: 15px;
   font-weight: 500;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
-  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.25);
+  box-shadow: 0 2px 8px rgba(107, 163, 190, 0.25);
   transition: all 0.2s ease;
 }
 
 .settings-form :deep(.el-button--primary:hover) {
-  background: #0066d6;
+  background: #5A93AE;
 }
 
 .settings-form :deep(.el-button--primary:active) {
@@ -755,19 +755,19 @@ const handleFileChange = async (event) => {
 }
 
 .settings-form :deep(.el-button--danger) {
-  background: #FF3B30;
+  background: #D48B8B;
   border: none;
   border-radius: 10px;
   padding: 12px 28px;
   font-size: 15px;
   font-weight: 500;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
-  box-shadow: 0 2px 8px rgba(255, 59, 48, 0.25);
+  box-shadow: 0 2px 8px rgba(212, 139, 139, 0.25);
   transition: all 0.2s ease;
 }
 
 .settings-form :deep(.el-button--danger:hover) {
-  background: #e03a30;
+  background: #C47B7B;
 }
 
 .settings-form :deep(.el-button--default) {
@@ -802,8 +802,8 @@ const handleFileChange = async (event) => {
   display: flex;
   gap: 16px;
   padding: 20px;
-  background: rgba(255, 59, 48, 0.06);
-  border: 1px solid rgba(255, 59, 48, 0.15);
+  background: rgba(212, 139, 139, 0.06);
+  border: 1px solid rgba(212, 139, 139, 0.15);
   border-radius: 12px;
   margin-bottom: 28px;
 }
@@ -812,7 +812,7 @@ const handleFileChange = async (event) => {
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background: rgba(255, 59, 48, 0.12);
+  background: rgba(212, 139, 139, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -822,14 +822,14 @@ const handleFileChange = async (event) => {
 .warning-icon svg {
   width: 22px;
   height: 22px;
-  color: #FF3B30;
+  color: #D48B8B;
 }
 
 .warning-content h4 {
   margin: 0 0 6px 0;
   font-size: 15px;
   font-weight: 600;
-  color: #FF3B30;
+  color: #D48B8B;
 }
 
 .warning-content p {

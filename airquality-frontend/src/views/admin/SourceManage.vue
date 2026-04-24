@@ -199,9 +199,6 @@ onMounted(() => loadData())
 .manage-page {
   min-height: calc(100vh - 112px);
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
-  background: linear-gradient(135deg, #E8F4F8 0%, #F5F0E8 50%, #F0E8F5 100%);
-  padding: 24px;
-  border-radius: 20px;
 }
 
 .page-header {
@@ -217,14 +214,14 @@ onMounted(() => loadData())
   margin: 0 0 4px 0;
   font-size: 28px;
   font-weight: 700;
-  color: #2D2D2D;
+  color: #1d1d1f;
   letter-spacing: -0.02em;
 }
 
 .page-title p {
   margin: 0;
   font-size: 14px;
-  color: #5A5A5A;
+  color: #86868b;
 }
 
 .page-actions {
@@ -238,25 +235,24 @@ onMounted(() => loadData())
 .type-select { width: 130px; }
 .date-picker { width: 260px; }
 
-/* 莫兰迪风格按钮 */
+/* 苹果风格按钮 */
 .apple-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 10px 18px;
+  padding: 8px 16px;
   font-size: 14px;
   font-weight: 500;
-  color: #2D2D2D;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1.5px solid rgba(107, 163, 190, 0.2);
-  border-radius: 12px;
+  color: #1d1d1f;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .apple-btn:hover {
-  background: rgba(255, 255, 255, 1);
-  border-color: rgba(107, 163, 190, 0.4);
+  background: #f5f5f7;
 }
 
 .apple-btn:disabled {
@@ -266,37 +262,34 @@ onMounted(() => loadData())
 
 .apple-btn.primary {
   color: #fff;
-  background: linear-gradient(135deg, #6BA3BE 0%, #7DBE8C 100%);
-  border: none;
-  box-shadow: 0 4px 12px rgba(107, 163, 190, 0.25);
+  background: #6BA3BE;
+  border-color: #6BA3BE;
 }
 
 .apple-btn.primary:hover {
-  background: linear-gradient(135deg, #5A93AE 0%, #6BAE7C 100%);
-  transform: translateY(-1px);
+  background: #5A93AE;
 }
 
 /* 表格卡片 */
 .table-card {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 20px;
-  padding: 24px;
-  box-shadow: 0 4px 20px rgba(107, 163, 190, 0.08);
-  backdrop-filter: blur(10px);
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
 }
 
 .source-tag {
   font-size: 12px;
   padding: 4px 10px;
-  border-radius: 8px;
+  border-radius: 6px;
   font-weight: 500;
 }
 
-.tag-industrial { background: rgba(125, 190, 140, 0.15); color: #7DBE8C; }
-.tag-vehicle { background: rgba(107, 163, 190, 0.15); color: #6BA3BE; }
-.tag-dust { background: rgba(142, 142, 147, 0.15); color: #8e8e93; }
-.tag-coal { background: rgba(212, 167, 106, 0.15); color: #D4A76A; }
-.tag-other { background: rgba(176, 139, 212, 0.15); color: #B08BD4; }
+.tag-industrial { background: rgba(125, 190, 140, 0.12); color: #7DBE8C; }
+.tag-vehicle { background: rgba(107, 163, 190, 0.12); color: #6BA3BE; }
+.tag-dust { background: rgba(229, 192, 123, 0.12); color: #E5C07B; }
+.tag-coal { background: rgba(176, 139, 212, 0.12); color: #B08BD4; }
+.tag-other { background: rgba(154, 181, 197, 0.12); color: #9AB5C5; }
 
 .contribution-cell {
   display: flex;
@@ -307,14 +300,14 @@ onMounted(() => loadData())
 .contribution-bar {
   flex: 1;
   height: 8px;
-  background: rgba(107, 163, 190, 0.1);
+  background: rgba(0, 0, 0, 0.06);
   border-radius: 4px;
   overflow: hidden;
 }
 
 .bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #6BA3BE, #7DBE8C);
+  background: linear-gradient(90deg, #6BA3BE, #8BBDD4);
   border-radius: 4px;
   transition: width 0.3s;
 }
@@ -322,7 +315,7 @@ onMounted(() => loadData())
 .contribution-value {
   font-size: 13px;
   font-weight: 600;
-  color: #2D2D2D;
+  color: #1d1d1f;
   min-width: 50px;
   text-align: right;
 }
@@ -338,18 +331,18 @@ onMounted(() => loadData())
   color: #6BA3BE;
   background: transparent;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
   transition: all 0.15s;
   font-weight: 500;
 }
 
 .action-btn:hover {
-  background: rgba(107, 163, 190, 0.1);
+  background: rgba(107, 163, 190, 0.08);
 }
 
 .action-btn.danger { color: #D48B8B; }
-.action-btn.danger:hover { background: rgba(212, 139, 139, 0.1); }
+.action-btn.danger:hover { background: rgba(212, 139, 139, 0.08); }
 
 .pagination-wrapper {
   margin-top: 20px;
