@@ -625,7 +625,7 @@ const handleCityChange = async () => {
     const values = pollutantData.value.length > 0
       ? pollutants.map(p => {
           const found = pollutantData.value.find(d => d.pollutantType === p)
-          return found ? found.value : 0
+          return found ? (found.concentration || found.value || 0) : 0
         })
       : [50, 40, 20, 35, 30, 15]
     radarChart.setOption({
@@ -757,19 +757,29 @@ const initRadarChart = () => {
   const values = pollutantData.value.length > 0
     ? pollutants.map(p => {
         const found = pollutantData.value.find(d => d.pollutantType === p)
-        return found ? found.value : 0
+        return found ? (found.concentration || found.value || 0) : 0
       })
     : [50, 40, 20, 35, 30, 15]
 
   radarChart.setOption({
     backgroundColor: 'transparent',
     radar: {
-      indicator: pollutants.map(p => ({ name: p, max: 100 })),
+      indicator: [
+        { name: 'PM2.5', max: 500 },
+        { name: 'PM10', max: 600 },
+        { name: 'SO₂', max: 800 },
+        { name: 'NO₂', max: 400 },
+        { name: 'O₃', max: 400 },
+        { name: 'CO', max: 20 }
+      ],
       shape: 'polygon',
       splitNumber: 4,
+      center: ['50%', '52%'],
+      radius: '58%',
       axisName: {
         color: '#5A5A5A',
-        fontSize: 11
+        fontSize: 11,
+        padding: [0, 0, 0, 0]
       },
       splitLine: {
         lineStyle: { color: '#D8D8D8' }
