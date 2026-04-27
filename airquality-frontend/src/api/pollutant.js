@@ -59,7 +59,16 @@ export function exportPollutant(data) {
       'Authorization': `Bearer ${token}`
     }
   }).then(response => {
+    // 检查响应是否为错误（有些情况下后端返回JSON错误信息）
+    const contentType = response.headers['content-type']
+    if (contentType && contentType.includes('application/json')) {
+      // 如果返回的是JSON，说明出错了
+      return Promise.reject(new Error('导出失败'))
+    }
     return response.data
+  }).catch(error => {
+    console.error('导出失败:', error)
+    return Promise.reject(error)
   })
 }
 

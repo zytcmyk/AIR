@@ -53,9 +53,9 @@
           <div class="user-info">
             <span class="username">{{ userStore.userInfo?.username }}</span>
             <el-dropdown @command="handleCommand" trigger="click">
-              <div class="avatar">
+              <el-avatar :size="36" class="avatar" :src="userStore.userInfo?.avatar">
                 {{ userStore.userInfo?.username?.charAt(0).toUpperCase() }}
-              </div>
+              </el-avatar>
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item command="logout">退出登录</el-dropdown-item>
@@ -340,18 +340,12 @@ const handleCommand = async (command) => {
 }
 
 .avatar {
-  width: 36px;
-  height: 36px;
-  background: linear-gradient(135deg, #007AFF, #5856D6);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 600;
-  color: #fff;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 122, 255, 0.25);
+}
+
+.avatar :deep(.el-avatar-img) {
+  object-fit: cover;
 }
 
 /* 内容区 */

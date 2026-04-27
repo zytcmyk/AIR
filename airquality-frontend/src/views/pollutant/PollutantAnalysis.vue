@@ -357,17 +357,54 @@ const handleExport = async () => {
     searchForm.startDate = dateRange.value[0]
     searchForm.endDate = dateRange.value[1]
   }
+
+  ElMessage.info('正在导出，请稍候...')
+
   try {
-    const res = await exportPollutant(searchForm)
-    const blob = new Blob([res], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+    // 使用后端导出接口
+    const token = localStorage.getItem('token')
+    console.log('开始导出，参数:', searchForm)
+
+    const response = await fetch('/api/pollutant/export', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(searchForm)
+    })
+
+    console.log('响应状态:', response.status)
+
+    if (!response.ok) {
+      const text = await response.text()
+      console.error('导出失败响应:', text)
+      throw new Error('导出失败: ' + response.status)
+    }
+
+    const blob = await response.blob()
+    console.log('Blob大小:', blob.size)
+
+    if (!blob || blob.size === 0) {
+      ElMessage.warning('没有可导出的数据')
+      return
+    }
+
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = '污染物数据.xlsx'
+    const fileName = searchForm.city ? `污染物数据_${searchForm.city}` : '污染物数据'
+    a.download = `${fileName}.xlsx`
+    document.body.appendChild(a)
     a.click()
+    document.body.removeChild(a)
     URL.revokeObjectURL(url)
+
     ElMessage.success('导出成功')
-  } catch { ElMessage.error('导出失败') }
+  } catch (e) {
+    console.error('导出失败:', e)
+    ElMessage.error('导出失败: ' + e.message)
+  }
 }
 
 // 加载城市列表

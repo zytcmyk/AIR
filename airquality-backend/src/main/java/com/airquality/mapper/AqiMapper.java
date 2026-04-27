@@ -99,9 +99,9 @@ public interface AqiMapper extends BaseMapper<AqiData> {
     List<CityAqiDTO> getLatestCityAqiWithCoords();
 
     /**
-     * 获取所有城市列表
+     * 获取所有城市列表（限制数量避免慢查询）
      */
-    @Select("SELECT DISTINCT city FROM aqi_data ORDER BY city")
+    @Select("SELECT DISTINCT city FROM aqi_data ORDER BY city LIMIT 100")
     List<String> getAllCities();
 
     /**

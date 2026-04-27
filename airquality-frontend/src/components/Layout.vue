@@ -33,7 +33,9 @@
         <div class="sidebar-footer">
           <el-dropdown @command="handleCommand" trigger="click" placement="right">
             <div class="user-trigger">
-              <el-avatar :size="32" class="user-avatar">{{ userStore.userInfo?.username?.charAt(0).toUpperCase() }}</el-avatar>
+              <el-avatar :size="32" class="user-avatar" :src="userStore.userInfo?.avatar">
+                {{ userStore.userInfo?.username?.charAt(0).toUpperCase() }}
+              </el-avatar>
               <div class="user-info">
                 <span class="user-name">{{ userStore.userInfo?.username }}</span>
                 <span class="user-role">{{ userStore.isAdmin ? '管理员' : '用户' }}</span>

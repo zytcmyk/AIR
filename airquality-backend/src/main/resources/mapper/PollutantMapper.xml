@@ -21,6 +21,7 @@
             </if>
         </where>
         ORDER BY date DESC, value DESC
+        LIMIT 10000
     </select>
 
     <!-- 获取某城市某污染物近N天趋势 -->
